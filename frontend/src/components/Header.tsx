@@ -36,7 +36,7 @@ export default function Header() {
               variant={pathname === "/herramienta" ? "default" : "outline"}
               size="sm"
             >
-              Herramienta
+              Organizar Destinos
             </Button>
           </Link>
         </div>

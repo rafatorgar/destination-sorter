@@ -48,6 +48,7 @@ export default function Herramienta() {
   const [destinos, setDestinos] = useState<Destino[]>([]);
   const [done, setDone] = useState(false);
   const [phase, setPhase] = useState<"form" | "results">("form");
+  const [busqueda, setBusqueda] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const archivoRef = useRef<File | null>(null);
   const municipioRef = useRef("");
@@ -163,9 +164,15 @@ export default function Herramienta() {
     setOrigen("");
     setTotal(0);
     setError("");
+    setBusqueda("");
   };
 
   const sortedDestinos = [...destinos].sort((a, b) => a.distancia - b.distancia);
+  const filteredDestinos = busqueda
+    ? sortedDestinos.filter((d) =>
+        d.municipio.toLowerCase().includes(busqueda.toLowerCase())
+      )
+    : sortedDestinos;
 
   return (
     <section className="py-16 px-6 bg-gradient-to-b from-muted/40 to-background min-h-[80vh]">
@@ -292,11 +299,43 @@ export default function Herramienta() {
               <div className="flex items-center gap-2">
                 {done && (
                   <>
-                    <Button variant="outline" size="sm" onClick={handleDownload}>
-                      Descargar CSV
-                    </Button>
                     <Button variant="outline" size="sm" onClick={handleReset}>
                       Nueva consulta
+                    </Button>
+                    <a
+                      href="https://ko-fi.com/rafatorresgarcia"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-[#8B6914]/40 text-[#6F4E37] bg-[#D2B48C]/30 hover:bg-[#D2B48C]/45 gap-1.5"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          className="w-4 h-4"
+                          stroke="currentColor"
+                          strokeWidth={1.5}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                          <line x1="6" y1="1" x2="6" y2="4" />
+                          <line x1="10" y1="1" x2="10" y2="4" />
+                          <line x1="14" y1="1" x2="14" y2="4" />
+                        </svg>
+                        Invítame a un café
+                      </Button>
+                    </a>
+                    <Button
+                      size="sm"
+                      onClick={handleDownload}
+                      className="bg-foreground text-background hover:bg-foreground/90"
+                    >
+                      Descargar CSV
                     </Button>
                   </>
                 )}
@@ -341,8 +380,8 @@ export default function Herramienta() {
               </motion.div>
             )}
 
-            {/* Visual radar — always visible once we have data */}
-            {destinos.length > 0 && (
+            {/* Visual radar — only when done */}
+            {done && destinos.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -360,9 +399,18 @@ export default function Herramienta() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <h3 className="text-lg font-semibold text-foreground mb-3">
-                  Todos los destinos ({sortedDestinos.length})
-                </h3>
+                <div className="flex items-center justify-between gap-4 mb-3">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Todos los destinos ({filteredDestinos.length})
+                  </h3>
+                  <Input
+                    type="text"
+                    placeholder="Buscar municipio..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    className="max-w-xs"
+                  />
+                </div>
                 <Card className="glass overflow-x-auto">
                   <CardContent className="p-0">
                     <Table>
@@ -376,7 +424,7 @@ export default function Herramienta() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {sortedDestinos.map((dest, i) => (
+                        {filteredDestinos.map((dest, i) => (
                           <motion.tr
                             key={i}
                             initial={{ opacity: 0, x: -10 }}

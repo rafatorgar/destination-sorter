@@ -156,8 +156,9 @@ export default function Home() {
           className="max-w-3xl mx-auto relative"
         >
           <motion.h1
-            variants={fadeUp}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1, ease: "easeOut" }}
             className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6"
           >
             Ordena
@@ -168,8 +169,9 @@ export default function Home() {
             por distancia
           </motion.h1>
           <motion.p
-            variants={fadeUp}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1, delay: 0.15, ease: "easeOut" }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             Sube tu listado de plazas en Excel, indica tu municipio de
@@ -177,8 +179,9 @@ export default function Home() {
             Así de sencillo.
           </motion.p>
           <motion.div
-            variants={fadeUp}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
             className="mb-12"
           >
             <Link href="/herramienta">
