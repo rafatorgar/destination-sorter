@@ -31,6 +31,17 @@ export default function Header() {
           >
             Inicio
           </Link>
+          <Link
+            href="/blog"
+            className={cn(
+              "px-3 py-2 rounded-md text-sm font-medium transition-colors",
+              pathname.startsWith("/blog")
+                ? "text-foreground bg-muted"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+            )}
+          >
+            Blog
+          </Link>
           <Link href="/herramienta">
             <Button
               variant={pathname === "/herramienta" ? "default" : "outline"}

@@ -10,3 +10,4 @@ Lee el más reciente para tener el contexto actual. Si necesitas más profundida
 
 ## Sesiones
 - `2026-03-27_setup-inicial-diseno.md` — Setup del proyecto, diseño completo de landing y herramienta
+- `2026-03-28_mejoras-ui-deploy.md` — Ko-fi button, buscador en tabla, Steps animados, hero blur, deploy Railway + dominio custom

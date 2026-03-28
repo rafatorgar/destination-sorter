@@ -32,6 +32,19 @@ def get_gmaps_client() -> googlemaps.Client:
         raise HTTPException(status_code=500, detail="API Key de Google Maps no válida")
 
 
+def geocode_municipio(gmaps: googlemaps.Client, municipio: str, provincia: str = ""):
+    """Return {lat, lng} for a municipio, or None if not found."""
+    try:
+        query = f"{municipio}, {provincia}, España" if provincia else f"{municipio}, España"
+        results = gmaps.geocode(query)
+        if results:
+            loc = results[0]["geometry"]["location"]
+            return {"lat": loc["lat"], "lng": loc["lng"]}
+    except Exception:
+        pass
+    return None
+
+
 def calcular_distancia(gmaps: googlemaps.Client, origen: str, destino: str, provincia: str) -> float:
     try:
         result = gmaps.distance_matrix(origins=origen, destinations=destino, mode="driving")
@@ -71,14 +84,26 @@ async def procesar(
     columns = [col for col in df.columns]
 
     def generate():
-        # Send start event with column names
-        yield json.dumps({"type": "start", "origen": municipio_referencia, "total": total, "columnas": columns}) + "\n"
+        # Geocode origin
+        origen_coords = geocode_municipio(gmaps, municipio_referencia)
+
+        # Send start event with column names and origin coordinates
+        yield json.dumps({
+            "type": "start",
+            "origen": municipio_referencia,
+            "total": total,
+            "columnas": columns,
+            "origen_coords": origen_coords,
+        }) + "\n"
 
         for _, fila in df.iterrows():
             municipio = str(fila.get("MUNICIPIO", ""))
             provincia = str(fila.get("PROVINCIA", ""))
             distancia = calcular_distancia(gmaps, municipio_referencia, municipio, provincia)
             dist_value = round(distancia, 1) if distancia != float("inf") else None
+
+            # Geocode destination
+            coords = geocode_municipio(gmaps, municipio, provincia)
 
             # Send all original columns + distance
             row_data = {}
@@ -98,6 +123,7 @@ async def procesar(
                 "municipio": municipio,
                 "provincia": provincia,
                 "distancia": dist_value,
+                "coords": coords,
             }) + "\n"
 
         yield json.dumps({"type": "done"}) + "\n"

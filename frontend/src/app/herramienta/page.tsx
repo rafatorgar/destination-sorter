@@ -21,6 +21,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ResultsRadar from "@/components/ResultsRadar";
+import dynamic from "next/dynamic";
+
+const ResultsMap = dynamic(() => import("@/components/ResultsMap"), { ssr: false });
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
@@ -35,6 +38,7 @@ interface Destino {
   provincia: string;
   distancia: number;
   data: Record<string, unknown>;
+  coords?: { lat: number; lng: number } | null;
 }
 
 export default function Herramienta() {
@@ -49,6 +53,7 @@ export default function Herramienta() {
   const [done, setDone] = useState(false);
   const [phase, setPhase] = useState<"form" | "results">("form");
   const [busqueda, setBusqueda] = useState("");
+  const [origenCoords, setOrigenCoords] = useState<{ lat: number; lng: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const archivoRef = useRef<File | null>(null);
   const municipioRef = useRef("");
@@ -105,6 +110,7 @@ export default function Herramienta() {
             setOrigen(event.origen);
             setTotal(event.total);
             setColumnas(event.columnas || []);
+            if (event.origen_coords) setOrigenCoords(event.origen_coords);
           } else if (event.type === "destino") {
             setDestinos((prev) => [
               ...prev,
@@ -113,6 +119,7 @@ export default function Herramienta() {
                 provincia: event.provincia,
                 distancia: event.distancia ?? Infinity,
                 data: event.data || {},
+                coords: event.coords || null,
               },
             ]);
           } else if (event.type === "done") {
@@ -165,6 +172,7 @@ export default function Herramienta() {
     setTotal(0);
     setError("");
     setBusqueda("");
+    setOrigenCoords(null);
   };
 
   const sortedDestinos = [...destinos].sort((a, b) => a.distancia - b.distancia);
@@ -389,6 +397,22 @@ export default function Herramienta() {
                 className="mb-8"
               >
                 <ResultsRadar origen={origen} destinos={sortedDestinos} />
+              </motion.div>
+            )}
+
+            {/* Map — show when done */}
+            {done && destinos.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="mb-8"
+              >
+                <ResultsMap
+                  origen={origen}
+                  origenCoords={origenCoords}
+                  destinos={sortedDestinos}
+                />
               </motion.div>
             )}
 

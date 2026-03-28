@@ -48,4 +48,8 @@ context/
 ```
 
 ## Deploy
-Target: Railway (dos servicios). Pendiente de configurar.
+- **Railway** con dos servicios conectados al repo de GitHub (auto-deploy)
+- **Frontend**: `frontend-production-1e891.up.railway.app` (puerto 8080)
+- **Backend**: `backend-production-caf0.up.railway.app` (puerto 8080)
+- **Dominio**: `destinosoposiciones.rafatorresgarcia.com` (DNS en Cloudflare, nube gris)
+- Variables de entorno en Railway: `GOOGLE_MAPS_API_KEY` (backend), `NEXT_PUBLIC_BACKEND_URL` (frontend)

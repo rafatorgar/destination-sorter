@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const STEP_DURATION = 3000; // ms per step
 const TOTAL_STEPS = 3;
@@ -401,6 +403,24 @@ export default function Steps() {
             );
           })}
         </div>
+
+        {/* CTA after steps */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="text-center mt-14"
+        >
+          <Link href="/herramienta">
+            <Button
+              size="lg"
+              className="text-base px-8 py-6 rounded-xl bg-foreground text-background hover:bg-foreground/90"
+            >
+              Probarlo ahora
+            </Button>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

@@ -234,7 +234,7 @@ export default function Home() {
           </motion.p>
 
           <div className="space-y-20">
-            {/* Feature 1: Visual map */}
+            {/* Feature 1: Radar — closest destinations filter */}
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -244,14 +244,18 @@ export default function Home() {
             >
               <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
                 <h3 className="text-xl font-semibold text-foreground mb-3">
-                  Mapa visual de distancias
+                  Tus 20 destinos más cercanos
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Visualiza todos tus destinos posibles en un radar interactivo.
-                  Tú en el centro, las plazas alrededor ordenadas por distancia
-                  real en coche. Haz zoom, arrastra y explora para encontrar las
-                  más cercanas de un vistazo.
+                <p className="text-muted-foreground leading-relaxed mb-5">
+                  De cientos de plazas, el radar filtra automáticamente las 20
+                  más cercanas a tu municipio. Tú en el centro, los destinos
+                  alrededor con nombre y distancia. Lo esencial, de un vistazo.
                 </p>
+                <Link href="/herramienta">
+                  <Button variant="outline" size="sm" className="rounded-lg">
+                    Ver mis destinos cercanos
+                  </Button>
+                </Link>
               </motion.div>
               <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
                 <div className="bg-foreground rounded-xl p-6 aspect-[4/3] flex items-center justify-center overflow-hidden">
@@ -260,24 +264,26 @@ export default function Home() {
                     <circle cx="150" cy="110" r="30" stroke="white" strokeOpacity="0.1" strokeWidth="0.8" />
                     <circle cx="150" cy="110" r="60" stroke="white" strokeOpacity="0.08" strokeWidth="0.8" />
                     <circle cx="150" cy="110" r="90" stroke="white" strokeOpacity="0.06" strokeWidth="0.8" />
-                    {/* Dots */}
+                    {/* Center */}
                     <circle cx="150" cy="110" r="3" fill="white" fillOpacity="0.15" />
                     <text x="150" y="126" fill="white" fillOpacity="0.5" fontSize="7" textAnchor="middle" fontWeight="600">Tú</text>
-                    {/* Destinations */}
+                    {/* Destinations with labels */}
                     {[
-                      [172, 88], [128, 92], [185, 115], [115, 130],
-                      [200, 80], [100, 75], [210, 140], [90, 150],
-                      [165, 50], [135, 170], [230, 100], [70, 100],
-                    ].map(([x, y], i) => (
+                      { x: 172, y: 88, name: "Montemayor", km: "12" },
+                      { x: 128, y: 92, name: "Fernán Núñez", km: "15" },
+                      { x: 185, y: 115, name: "Moriles", km: "22" },
+                      { x: 115, y: 130, name: "Lucena", km: "30" },
+                      { x: 200, y: 80, name: "Cabra", km: "38" },
+                      { x: 100, y: 75, name: "Rute", km: "45" },
+                      { x: 210, y: 140, name: "Priego", km: "52" },
+                      { x: 90, y: 150, name: "Baena", km: "55" },
+                    ].map((d, i) => (
                       <g key={i}>
-                        <line x1="150" y1="110" x2={x} y2={y} stroke="white" strokeOpacity="0.06" strokeWidth="0.5" strokeDasharray="2 2" />
-                        <circle cx={x} cy={y} r="2" fill="white" fillOpacity="0.5" />
+                        <circle cx={d.x} cy={d.y} r="2" fill="white" fillOpacity="0.5" />
+                        <text x={d.x + 5} y={d.y - 4} fill="white" fillOpacity="0.55" fontSize="5.5" fontWeight="500">{d.name}</text>
+                        <text x={d.x + 5} y={d.y + 3} fill="white" fillOpacity="0.25" fontSize="4.5">{d.km} km</text>
                       </g>
                     ))}
-                    {/* Labels on a couple */}
-                    <text x="207" y="77" fill="white" fillOpacity="0.6" fontSize="6" fontWeight="500">Córdoba</text>
-                    <text x="66" y="97" fill="white" fillOpacity="0.6" fontSize="6" fontWeight="500" textAnchor="end">Sevilla</text>
-                    <text x="98" y="72" fill="white" fillOpacity="0.6" fontSize="6" fontWeight="500" textAnchor="end">Madrid</text>
                     {/* Ring labels */}
                     <text x="183" y="108" fill="white" fillOpacity="0.2" fontSize="5">20 km</text>
                     <text x="213" y="108" fill="white" fillOpacity="0.2" fontSize="5">40 km</text>
@@ -286,7 +292,7 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
-            {/* Feature 2: Table */}
+            {/* Feature 2: Real map */}
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -296,16 +302,99 @@ export default function Home() {
             >
               <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="md:order-2">
                 <h3 className="text-xl font-semibold text-foreground mb-3">
+                  Todos los destinos en el mapa
+                </h3>
+                <p className="text-muted-foreground leading-relaxed mb-5">
+                  Visualiza cada plaza sobre el mapa real. Los destinos
+                  más cercanos aparecen más grandes y oscuros, los lejanos se
+                  atenúan. Haz clic en cualquier punto para ver municipio y
+                  distancia exacta.
+                </p>
+                <Link href="/herramienta">
+                  <Button variant="outline" size="sm" className="rounded-lg">
+                    Obtener mi mapa
+                  </Button>
+                </Link>
+              </motion.div>
+              <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="md:order-1">
+                <div className="bg-foreground rounded-xl p-6 aspect-[4/3] flex items-center justify-center overflow-hidden relative">
+                  <svg viewBox="0 0 300 260" fill="none" className="w-full h-full">
+                    {/* Córdoba province silhouette */}
+                    <path
+                      d="M80 30 L95 25 L120 20 L145 18 L170 20 L195 22 L215 28 L230 35 L240 30 L248 38 L245 50 L250 60 L248 72 L240 80 L235 90 L228 95 L225 105 L220 112 L210 118 L205 125 L210 135 L215 145 L220 155 L218 168 L210 178 L200 188 L190 198 L182 205 L175 212 L165 218 L155 222 L142 225 L130 222 L118 218 L108 210 L98 200 L88 192 L78 182 L72 172 L68 160 L65 148 L62 138 L60 128 L58 118 L55 108 L52 98 L50 88 L52 78 L55 68 L58 55 L62 45 L68 38 L75 32 Z"
+                      fill="white"
+                      fillOpacity="0.05"
+                      stroke="white"
+                      strokeOpacity="0.15"
+                      strokeWidth="1"
+                    />
+                    {/* Origin — Montilla */}
+                    <circle cx="160" cy="170" r="5" fill="black" stroke="white" strokeWidth="2" />
+                    <circle cx="160" cy="170" r="12" fill="none" stroke="white" strokeWidth="0.8" strokeOpacity="0.2" strokeDasharray="2 2" />
+                    {/* Nearby destinations */}
+                    {[
+                      { x: 148, y: 158, r: 3.5, o: 0.7 },
+                      { x: 172, y: 162, r: 3.2, o: 0.65 },
+                      { x: 140, y: 180, r: 3, o: 0.6 },
+                      { x: 178, y: 178, r: 2.8, o: 0.55 },
+                      { x: 125, y: 192, r: 2.5, o: 0.5 },
+                      { x: 192, y: 190, r: 2.2, o: 0.45 },
+                      { x: 185, y: 145, r: 2, o: 0.4 },
+                    ].map((d, i) => (
+                      <circle key={`near-${i}`} cx={d.x} cy={d.y} r={d.r} fill="white" fillOpacity={d.o} />
+                    ))}
+                    {/* Medium distance */}
+                    {[
+                      { x: 168, y: 118, r: 2, o: 0.35 },
+                      { x: 130, y: 130, r: 1.6, o: 0.3 },
+                      { x: 200, y: 130, r: 1.5, o: 0.28 },
+                    ].map((d, i) => (
+                      <circle key={`mid-${i}`} cx={d.x} cy={d.y} r={d.r} fill="white" fillOpacity={d.o} />
+                    ))}
+                    {/* Far destinations */}
+                    {[
+                      { x: 155, y: 55, r: 1.2, o: 0.2 },
+                      { x: 130, y: 65, r: 1.1, o: 0.18 },
+                      { x: 185, y: 50, r: 1.1, o: 0.18 },
+                      { x: 110, y: 85, r: 1, o: 0.15 },
+                      { x: 200, y: 70, r: 1, o: 0.15 },
+                    ].map((d, i) => (
+                      <circle key={`far-${i}`} cx={d.x} cy={d.y} r={d.r} fill="white" fillOpacity={d.o} />
+                    ))}
+                    {/* Popup example */}
+                    <rect x="100" y="140" width="42" height="16" rx="3" fill="white" fillOpacity="0.12" />
+                    <text x="105" y="148" fontSize="4.5" fontWeight="600" fill="white" fillOpacity="0.9">Lucena</text>
+                    <text x="105" y="153" fontSize="3.5" fill="white" fillOpacity="0.5">29.8 km</text>
+                  </svg>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Feature 3: Table — text left, visual right */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={stagger}
+              className="grid md:grid-cols-2 gap-8 items-center"
+            >
+              <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
+                <h3 className="text-xl font-semibold text-foreground mb-3">
                   Tabla ordenada con todos los datos
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed mb-5">
                   Todas las plazas de tu listado ordenadas de más cerca a más
                   lejos, con la distancia en kilómetros por carretera. Conserva
                   todas las columnas originales del Excel: códigos de centro,
                   provincia, tipo de plaza y todo lo que necesitas.
                 </p>
+                <Link href="/herramienta">
+                  <Button variant="outline" size="sm" className="rounded-lg">
+                    Ordenar mis plazas
+                  </Button>
+                </Link>
               </motion.div>
-              <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="md:order-1">
+              <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
                 <div className="bg-foreground rounded-xl p-5 overflow-hidden">
                   <table className="w-full text-[11px]">
                     <thead>
@@ -338,7 +427,7 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
-            {/* Feature 3: Download */}
+            {/* Feature 4: Download — text right, visual left */}
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -346,16 +435,21 @@ export default function Home() {
               variants={stagger}
               className="grid md:grid-cols-2 gap-8 items-center"
             >
-              <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
+              <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="md:order-2">
                 <h3 className="text-xl font-semibold text-foreground mb-3">
                   Descarga tu resultado
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed mb-5">
                   Exporta el listado completo con las distancias calculadas.
                   Llévatelo en CSV para abrirlo en Excel, Google Sheets o donde
                   prefieras. Compártelo con otros opositores o úsalo como
                   referencia al elegir destino.
                 </p>
+                <Link href="/herramienta">
+                  <Button variant="outline" size="sm" className="rounded-lg">
+                    Descargar mi listado
+                  </Button>
+                </Link>
               </motion.div>
               <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
                 <div className="bg-foreground rounded-xl p-8 flex flex-col items-center justify-center aspect-[4/3]">

@@ -51,7 +51,7 @@ export default function ResultsRadar({ origen, destinos }: ResultsRadarProps) {
         ...dest,
         x: cx + Math.cos(angle) * r,
         y: cy + Math.sin(angle) * r,
-        key: `${dest.municipio}-${dest.distancia}`,
+        key: `${dest.municipio}-${dest.distancia}-${i}`,
         idx: i,
       };
     });
@@ -232,39 +232,28 @@ export default function ResultsRadar({ origen, destinos }: ResultsRadarProps) {
                     fillOpacity={hovered === p.idx ? 0.9 : 0.5}
                     style={{ transition: "all 0.15s ease" }}
                   />
-                  {/* Label — only on hover */}
-                  {hovered === p.idx && (
-                    <g>
-                      <rect
-                        x={p.x + 10 / zoom}
-                        y={p.y - 16 / zoom}
-                        width={Math.max(80, (p.municipio.length * 6.5 + 20)) / zoom}
-                        height={28 / zoom}
-                        rx={4 / zoom}
-                        fill="white"
-                        fillOpacity={0.12}
-                      />
-                      <text
-                        x={p.x + 16 / zoom}
-                        y={p.y - 4 / zoom}
-                        fill="white"
-                        fillOpacity={0.95}
-                        fontSize={11 / zoom}
-                        fontWeight={600}
-                      >
-                        {p.municipio}
-                      </text>
-                      <text
-                        x={p.x + 16 / zoom}
-                        y={p.y + 8 / zoom}
-                        fill="white"
-                        fillOpacity={0.5}
-                        fontSize={9 / zoom}
-                      >
-                        {p.distancia} km
-                      </text>
-                    </g>
-                  )}
+                  {/* Label — always visible */}
+                  <text
+                    x={p.x + 8 / zoom}
+                    y={p.y - 6 / zoom}
+                    fill="white"
+                    fillOpacity={hovered === p.idx ? 0.95 : 0.6}
+                    fontSize={9 / zoom}
+                    fontWeight={hovered === p.idx ? 600 : 500}
+                    style={{ transition: "all 0.15s ease" }}
+                  >
+                    {p.municipio}
+                  </text>
+                  <text
+                    x={p.x + 8 / zoom}
+                    y={p.y + 5 / zoom}
+                    fill="white"
+                    fillOpacity={hovered === p.idx ? 0.7 : 0.3}
+                    fontSize={7.5 / zoom}
+                    style={{ transition: "all 0.15s ease" }}
+                  >
+                    {p.distancia} km
+                  </text>
                 </motion.g>
               ))}
             </AnimatePresence>
