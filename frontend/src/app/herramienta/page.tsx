@@ -136,7 +136,7 @@ export default function Herramienta() {
   };
 
   const handleDownload = () => {
-    if (sortedDestinos.length === 0) return;
+    if (sortedDestinos.length === 0 && destinosFallidos.length === 0) return;
 
     const allCols = [...columnas, "Distancia (km)"];
     const escape = (v: unknown) => {
@@ -147,9 +147,10 @@ export default function Herramienta() {
     };
 
     const header = allCols.map(escape).join(",");
-    const rows = sortedDestinos.map((d) =>
+    const allForCsv = [...sortedDestinos, ...destinosFallidos];
+    const rows = allForCsv.map((d) =>
       allCols.map((col) => {
-        if (col === "Distancia (km)") return d.distancia === Infinity ? "" : String(d.distancia);
+        if (col === "Distancia (km)") return d.distancia === Infinity ? "Sin ruta" : String(d.distancia);
         return escape(d.data[col] ?? "");
       }).join(",")
     );
@@ -175,12 +176,14 @@ export default function Herramienta() {
     setOrigenCoords(null);
   };
 
-  const sortedDestinos = [...destinos].sort((a, b) => a.distancia - b.distancia);
+  const destinosFallidos = destinos.filter((d) => d.distancia === Infinity);
+  const destinosValidos = [...destinos].filter((d) => d.distancia !== Infinity).sort((a, b) => a.distancia - b.distancia);
+  const sortedDestinos = destinosValidos;
   const filteredDestinos = busqueda
-    ? sortedDestinos.filter((d) =>
+    ? destinosValidos.filter((d) =>
         d.municipio.toLowerCase().includes(busqueda.toLowerCase())
       )
-    : sortedDestinos;
+    : destinosValidos;
 
   return (
     <section className="py-16 px-6 bg-gradient-to-b from-muted/40 to-background min-h-[80vh]">
@@ -425,7 +428,7 @@ export default function Herramienta() {
               >
                 <div className="flex items-center justify-between gap-4 mb-3">
                   <h3 className="text-lg font-semibold text-foreground">
-                    Todos los destinos ({filteredDestinos.length})
+                    Destinos ordenados ({filteredDestinos.length})
                   </h3>
                   <Input
                     type="text"
@@ -457,9 +460,7 @@ export default function Herramienta() {
                             className="border-b border-border/50"
                           >
                             <TableCell className="tabular-nums font-semibold">
-                              {dest.distancia === Infinity
-                                ? "—"
-                                : `${dest.distancia}`}
+                              {dest.distancia}
                             </TableCell>
                             <TableCell className="font-medium">
                               {dest.data["MUNICIPIO"] != null ? String(dest.data["MUNICIPIO"]) : dest.municipio}
@@ -476,6 +477,43 @@ export default function Herramienta() {
                         ))}
                       </TableBody>
                     </Table>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Failed destinations — separate section */}
+            {done && destinosFallidos.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="mt-8"
+              >
+                <h3 className="text-lg font-semibold text-foreground mb-3">
+                  Destinos sin ruta disponible ({destinosFallidos.length})
+                </h3>
+                <Card className="glass">
+                  <CardContent className="p-5">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Google Maps no pudo calcular la distancia en coche a estos municipios. Esto suele ocurrir con destinos insulares (Baleares, Canarias, Ceuta, Melilla) o direcciones no reconocidas.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                      {destinosFallidos.map((d, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg border border-dashed border-border bg-muted/30"
+                        >
+                          <span className="text-muted-foreground/50">—</span>
+                          <div>
+                            <span className="font-medium text-foreground">{d.municipio}</span>
+                            {d.provincia && (
+                              <span className="text-muted-foreground ml-1 text-xs">({d.provincia})</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>

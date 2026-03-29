@@ -112,6 +112,8 @@ async def procesar(
                 # Convert to JSON-safe value
                 if pd.isna(val):
                     row_data[col] = None
+                elif isinstance(val, float) and (val == float("inf") or val == float("-inf")):
+                    row_data[col] = None
                 else:
                     row_data[col] = val if isinstance(val, (str, int, float, bool)) else str(val)
 
