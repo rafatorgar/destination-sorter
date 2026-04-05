@@ -21,17 +21,17 @@ export const metadata: Metadata = {
     template: "%s | Destinos Oposiciones",
   },
   description:
-    "Herramienta gratuita para opositores: sube tu listado de plazas y ordénalas por distancia desde tu municipio. Ahorra tiempo eligiendo destinos cercanos.",
+    "¿Acabas de aprobar la oposición y tienes que elegir destino? Sube el listado de plazas, indica tu municipio y ordénalas por distancia en segundos. Gratis, sin registro.",
   keywords: [
-    "oposiciones",
-    "destinos oposiciones",
-    "ordenar plazas por distancia",
-    "municipios oposiciones",
-    "herramienta opositores",
-    "bolsa de interinos",
-    "concurso de traslados",
-    "distancia plazas oposiciones",
     "elegir destino oposiciones",
+    "adjudicación destinos oposiciones",
+    "ordenar plazas oposiciones por distancia",
+    "cómo elegir plaza oposición",
+    "listado vacantes oposiciones",
+    "bolsa de interinos elegir plaza",
+    "concurso de traslados distancia",
+    "plazas oposiciones cerca de casa",
+    "destinos oposiciones",
   ],
   alternates: {
     canonical: BASE_URL,
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Destinos Oposiciones | Ordena tus plazas por distancia",
     description:
-      "Sube tu Excel de plazas y ordénalas por distancia desde tu municipio de referencia. Herramienta gratuita para opositores.",
+      "Listado de plazas delante y hay que elegir destino. Sube el Excel, indica tu municipio y ordena todas las plazas por distancia en segundos. Gratis.",
     type: "website",
     locale: "es_ES",
     url: BASE_URL,
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Destinos Oposiciones | Ordena tus plazas por distancia",
     description:
-      "Sube tu Excel de plazas y ordénalas por distancia desde tu municipio de referencia.",
+      "Listado de plazas delante y hay que elegir destino. Súbelo, indica tu municipio y ordena todas las plazas por distancia en segundos.",
   },
   robots: {
     index: true,

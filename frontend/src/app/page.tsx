@@ -78,6 +78,24 @@ const faqs = [
     answer:
       "Sí. La herramienta funciona con municipios de toda España. Da igual que las plazas estén en Andalucía, Cataluña, Madrid o cualquier otra comunidad. Solo necesitas que el Excel tenga los nombres de los municipios.",
   },
+  {
+    question:
+      "Acabo de aprobar la oposición y tengo que elegir destino, ¿por dónde empiezo?",
+    answer:
+      "Lo primero es descargar el listado oficial de vacantes que publica la administración (suele estar en PDF o Excel). Si está en PDF, conviértelo a Excel. Luego súbelo a Destinos Oposiciones, indica tu municipio de referencia y tendrás todas las plazas ordenadas por distancia en segundos. A partir de ahí puedes filtrar tus opciones reales y ordenar tus preferencias con datos concretos, no a ojo.",
+  },
+  {
+    question:
+      "¿Cómo ordeno un listado de adjudicación de destinos por cercanía a mi casa?",
+    answer:
+      "La adjudicación de destinos suele publicarse como un listado con decenas o cientos de municipios. En lugar de buscarlos uno a uno en Google Maps, sube el Excel a la herramienta e introduce tu domicilio como municipio de referencia. En pocos minutos tendrás todas las plazas ordenadas de la más cercana a la más lejana, con la distancia por carretera calculada automáticamente.",
+  },
+  {
+    question:
+      "Me han publicado las vacantes y solo tengo unos días para ordenarlas, ¿cómo lo hago rápido?",
+    answer:
+      "Cuando el plazo para ordenar preferencias es corto, lo peor que puedes hacer es calcular distancias una por una. Con Destinos Oposiciones subes el listado completo, procesas todas las distancias de golpe y descargas el resultado en CSV. En menos de cinco minutos tienes una base objetiva para priorizar tus opciones, y te queda tiempo para valorar otros factores como coste de vida o transporte.",
+  },
 ];
 
 export default function Home() {

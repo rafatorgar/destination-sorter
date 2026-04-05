@@ -14,6 +14,97 @@ export interface Post {
 
 export const posts: Post[] = [
   {
+    slug: "adjudicacion-destinos-oposiciones",
+    title: "Adjudicación de destinos: qué hacer cuando publican el listado de vacantes",
+    description:
+      "Acaban de publicar la adjudicación de destinos de tu oposición y tienes pocos días para elegir. Guía práctica para ordenar el listado y no dejarlo al azar.",
+    date: "2026-04-05",
+    content: `
+Llega el mensaje al grupo de Telegram, al foro o al correo: **ha salido el listado de vacantes y hay X días para ordenar preferencias**. A partir de ese momento empieza una de las decisiones más importantes de tu carrera como funcionario, y lo habitual es afrontarla con prisas, un PDF interminable y Google Maps abierto en 40 pestañas.
+
+Esta guía es para ese momento exacto: cuando tienes el listado delante y necesitas ordenarlo **rápido y con criterio**.
+
+## 1. Lo primero: entender qué tienes delante
+
+Un listado de adjudicación de destinos suele contener:
+
+- Código del centro o plaza
+- Municipio (a veces también provincia y comunidad autónoma)
+- Tipo de puesto
+- Observaciones (itinerante, bilingüe, características específicas…)
+
+Antes de ordenar nada, **abre el archivo y comprueba que las columnas son claras**. Si la administración publica un PDF, conviértelo a Excel — cualquier conversor online gratuito sirve, y te ahorrará horas después.
+
+## 2. La distancia no es el único criterio, pero suele ser el primer filtro
+
+Cuando tienes 150 plazas y 72 horas, no puedes analizar cada una con detalle. Lo que sí puedes hacer es **filtrar brutalmente por distancia** para quedarte con un subconjunto manejable.
+
+Un flujo realista:
+
+1. Ordena las plazas por distancia desde tu domicilio
+2. Marca un umbral razonable (por ejemplo, "todo lo que esté a menos de 80 km")
+3. Ese subconjunto ya es tu lista corta
+4. Sobre esa lista corta aplicas el resto de criterios con más calma
+
+Para el paso 1, herramientas como [Destinos Oposiciones](https://destinosoposiciones.rafatorresgarcia.com/herramienta) calculan la distancia por carretera a todas las plazas de golpe. Subes el Excel, indicas tu municipio y en segundos tienes el listado ordenado.
+
+## 3. Sobre la lista corta, aplica los criterios que sí importan
+
+Una vez reducido el listado a 10-20 plazas razonables, sí merece la pena mirar plaza por plaza:
+
+- **Tiempo real de desplazamiento** (no kilómetros): una plaza a 70 km por autovía es mejor que una a 45 km por carretera secundaria
+- **Coste de vivienda** en el municipio y alrededores
+- **Servicios del centro**: horarios, tamaño, especialidad
+- **Posibilidad de traslado futuro**: plazas en destinos con mucha movilidad suelen ser puertas de entrada hacia otras más deseadas
+
+## 4. El orden de preferencias: no pongas solo las que te gustan
+
+Un error frecuente es ordenar únicamente las 5 plazas ideales y dejar el resto al azar. **La adjudicación respeta tu orden estricto**: si tus 5 primeras no caen y el resto están sin priorizar, puedes acabar en la plaza más lejana del listado.
+
+La estrategia razonable es:
+
+1. Las que realmente quieres (prioridad alta)
+2. Las aceptables ordenadas por distancia (bloque intermedio)
+3. Las que aceptarías a regañadientes pero prefieres a la peor opción (bloque final)
+
+Ordenar 150 plazas a mano es inviable, pero ordenarlas por distancia automáticamente y ajustar los bloques a mano sí es factible en una tarde.
+
+## 5. No lo hagas solo
+
+Los foros de opositores, los grupos de Telegram y los compañeros de convocatoria son una fuente de información valiosísima sobre destinos concretos: cuál tiene buen ambiente, cuál está reformado, cuál suele quedar vacante cada año. Cruzar tu lista corta con esa información cualitativa es lo que diferencia una buena decisión de una regular.
+
+## Resumen del proceso
+
+1. **Convierte el listado a Excel** si viene en PDF
+2. **Ordena por distancia** con una herramienta automática (no una por una en Google Maps)
+3. **Filtra** las que entran en tu umbral razonable
+4. **Analiza con detalle** solo las que pasan el filtro
+5. **Construye tu orden de preferencias** por bloques, cubriendo todas las plazas aceptables
+6. **Consulta a otros opositores** para los detalles cualitativos
+
+Lo importante no es hacerlo perfecto, sino hacerlo **con datos y no a ojo**. Una decisión así marca los próximos años de tu vida profesional y personal: invertir un par de horas bien en ordenarlo compensa sobradamente.
+
+    `,
+    faqs: [
+      {
+        question: "¿Cuánto tiempo se suele dar para ordenar preferencias en una adjudicación de destinos?",
+        answer: "Depende del cuerpo y la convocatoria, pero los plazos habituales están entre 3 y 10 días hábiles desde la publicación del listado. Algunas adjudicaciones son casi inmediatas y otras dan semanas, por eso conviene tener el listado ordenado por distancia cuanto antes.",
+      },
+      {
+        question: "¿Qué pasa si no ordeno todas las plazas del listado?",
+        answer: "Las plazas que dejes sin ordenar quedan al final automáticamente y en orden arbitrario. Si no caes en las que sí priorizaste, puedes acabar en cualquier plaza no priorizada, incluso en la más lejana. Por eso es recomendable ordenar todas, aunque sea en bloques.",
+      },
+      {
+        question: "¿Puedo convertir un PDF de adjudicación a Excel para procesarlo?",
+        answer: "Sí. Cualquier conversor de PDF a Excel online (gratuito o de pago) funciona si el PDF contiene tablas estructuradas. Una vez tengas el Excel con una columna llamada 'MUNICIPIO', puedes procesarlo directamente en Destinos Oposiciones.",
+      },
+      {
+        question: "¿Cómo combino distancia y otros criterios al ordenar preferencias?",
+        answer: "Lo más práctico es usar la distancia como primer filtro para quedarte con una lista corta (por ejemplo, todo lo que esté a menos de 80 km). Sobre esa lista corta ya puedes aplicar con detalle otros criterios como coste de vida, transporte, tipo de centro o perspectivas de traslado futuro.",
+      },
+    ],
+  },
+  {
     slug: "como-elegir-destino-oposiciones",
     title: "Cómo elegir destino en unas oposiciones: guía práctica",
     description:

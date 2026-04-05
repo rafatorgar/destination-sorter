@@ -261,6 +261,17 @@ export default function Herramienta() {
                           onChange={(e) => setArchivo(e.target.files?.[0] || null)}
                         />
                       </motion.div>
+                      <p className="text-xs text-muted-foreground text-center">
+                        ¿No tienes un Excel a mano?{" "}
+                        <a
+                          href="/ejemplo-plazas-oposiciones.xlsx"
+                          download
+                          className="underline hover:text-foreground transition-colors"
+                        >
+                          Descarga uno de ejemplo
+                        </a>{" "}
+                        para probar la herramienta.
+                      </p>
                     </div>
 
                     {error && (

@@ -3,14 +3,14 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Ordenar destinos por distancia",
   description:
-    "Sube tu Excel con las plazas de oposiciones, indica tu municipio y obtén el listado ordenado por distancia en kilómetros usando Google Maps.",
+    "¿Listado de vacantes o adjudicación de destinos delante? Sube el Excel, indica tu municipio y obtén todas las plazas ordenadas por distancia por carretera en segundos.",
   alternates: {
     canonical: "https://destinosoposiciones.rafatorresgarcia.com/herramienta",
   },
   openGraph: {
     title: "Ordenar destinos por distancia | Destinos Oposiciones",
     description:
-      "Sube tu Excel con las plazas de oposiciones, indica tu municipio y obtén el listado ordenado por distancia en kilómetros.",
+      "¿Listado de vacantes o adjudicación de destinos delante? Sube el Excel, indica tu municipio y obtén todas las plazas ordenadas por distancia en segundos.",
     url: "https://destinosoposiciones.rafatorresgarcia.com/herramienta",
   },
 };
