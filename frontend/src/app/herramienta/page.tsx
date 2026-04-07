@@ -124,6 +124,13 @@ export default function Herramienta() {
             ]);
           } else if (event.type === "done") {
             setDone(true);
+            // Google Analytics: procesamiento completado
+            if (typeof window !== "undefined" && typeof window.gtag === "function") {
+              window.gtag("event", "procesar_excel_completado", {
+                municipio_origen: municipioRef.current,
+                total_destinos: event.total || destinos.length,
+              });
+            }
           }
         }
       }
