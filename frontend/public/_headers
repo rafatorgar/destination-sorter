@@ -1,0 +1,9 @@
+# Cabeceras para Cloudflare Pages.
+
+# Las dos bases de datos son ficheros generados: solo cambian cuando se vuelve a
+# ejecutar el script correspondiente. Cachearlas un día evita que quien procesa
+# varios listados seguidos se descargue el MB de núcleos cada vez.
+/municipios.json
+  Cache-Control: public, max-age=86400
+/nucleos.json
+  Cache-Control: public, max-age=86400

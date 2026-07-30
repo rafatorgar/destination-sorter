@@ -22,23 +22,36 @@ import {
 } from "@/components/ui/table";
 import ResultsRadar from "@/components/ResultsRadar";
 import dynamic from "next/dynamic";
+import { ErrorExcel } from "@/lib/excel";
+import { cargaMunicipios, sugiereMunicipios, type Indice } from "@/lib/municipios";
+import { localizaOrigen, procesaListado, type Destino } from "@/lib/procesa";
 
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), { ssr: false });
-
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
 
-interface Destino {
-  municipio: string;
-  provincia: string;
-  distancia: number;
-  data: Record<string, unknown>;
-  coords?: { lat: number; lng: number } | null;
+/**
+ * Explica por qué no se reconoce el municipio de origen, y propone salidas.
+ *
+ * Antes lo interpretaba el geocodificador de Google, que tragaba con casi todo.
+ * Ahora se busca contra un listado cerrado, así que cuando falla hay que decir
+ * algo más útil que "no encontrado": o son homónimos —hay 82 nombres repetidos y
+ * se resuelven añadiendo la provincia— o es un nombre que no existe, y entonces
+ * lo que ayuda es enseñar los que más se le parecen.
+ */
+function mensajeOrigenNoEncontrado(indice: Indice, texto: string): string {
+  const nombre = texto.split(",")[0].trim();
+  const sugerencias = sugiereMunicipios(indice, nombre, 4);
+
+  if (!sugerencias.length) {
+    return `No se ha encontrado el municipio "${nombre}". Revisa cómo está escrito.`;
+  }
+
+  const lista = sugerencias.map((m) => `${m.nombre} (${m.provincia})`).join(", ");
+  return `No se ha encontrado "${nombre}". ¿Quizá buscabas: ${lista}? Puedes añadir la provincia separada por una coma.`;
 }
 
 export default function Herramienta() {
@@ -58,6 +71,10 @@ export default function Herramienta() {
   const archivoRef = useRef<File | null>(null);
   const municipioRef = useRef("");
 
+  /**
+   * Todo el procesado ocurre aquí, en el navegador: ya no hay backend al que
+   * subir el Excel. El fichero no sale del ordenador de quien lo usa.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!archivo || !municipio) {
@@ -71,72 +88,53 @@ export default function Herramienta() {
     setError("");
     setDestinos([]);
     setDone(false);
-    setPhase("results");
-
-    const formData = new FormData();
-    formData.append("archivo", archivo);
-    formData.append("municipio_referencia", municipio);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/procesar`, {
-        method: "POST",
-        body: formData,
+      /**
+       * El origen se comprueba antes de cambiar de pantalla. Si no se reconoce,
+       * el error hay que enseñarlo junto al campo donde se escribió, no en una
+       * pantalla de resultados vacía.
+       */
+      const indice = await cargaMunicipios();
+      const lugarOrigen = localizaOrigen(indice, municipio);
+
+      if (!lugarOrigen) {
+        setError(mensajeOrigenNoEncontrado(indice, municipio));
+        setLoading(false);
+        return;
+      }
+
+      setOrigen(lugarOrigen.nombre);
+      setOrigenCoords({ lat: lugarOrigen.lat, lng: lugarOrigen.lng });
+      setPhase("results");
+
+      const resultado = await procesaListado(archivo, municipio, {
+        alEmpezar: ({ total, columnas }) => {
+          setTotal(total);
+          setColumnas(columnas);
+        },
+        alAvanzar: (parciales) => setDestinos(parciales.filter((d) => !d.pendiente)),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || "Error al procesar el archivo.");
-      }
+      setColumnas(resultado.columnas);
+      setTotal(resultado.destinos.length);
+      setDestinos(resultado.destinos);
+      setDone(true);
 
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("No se pudo leer la respuesta.");
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done: readerDone, value } = await reader.read();
-        if (readerDone) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          const event = JSON.parse(line);
-
-          if (event.type === "start") {
-            setOrigen(event.origen);
-            setTotal(event.total);
-            setColumnas(event.columnas || []);
-            if (event.origen_coords) setOrigenCoords(event.origen_coords);
-          } else if (event.type === "destino") {
-            setDestinos((prev) => [
-              ...prev,
-              {
-                municipio: event.municipio,
-                provincia: event.provincia,
-                distancia: event.distancia ?? Infinity,
-                data: event.data || {},
-                coords: event.coords || null,
-              },
-            ]);
-          } else if (event.type === "done") {
-            setDone(true);
-            // Google Analytics: procesamiento completado
-            if (typeof window !== "undefined" && typeof window.gtag === "function") {
-              window.gtag("event", "procesar_excel_completado", {
-                municipio_origen: municipioRef.current,
-                total_destinos: event.total || destinos.length,
-              });
-            }
-          }
-        }
+      // Google Analytics: procesamiento completado
+      if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        window.gtag("event", "procesar_excel_completado", {
+          municipio_origen: municipioRef.current,
+          total_destinos: resultado.destinos.length,
+        });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error inesperado.");
-      if (destinos.length === 0) setPhase("form");
+      const mensaje =
+        err instanceof ErrorExcel || err instanceof Error
+          ? err.message
+          : "Error inesperado.";
+      setError(mensaje);
+      setPhase("form");
     } finally {
       setLoading(false);
     }
@@ -184,6 +182,8 @@ export default function Herramienta() {
   };
 
   const destinosFallidos = destinos.filter((d) => d.distancia === Infinity);
+  const destinosSinRuta = destinosFallidos.filter((d) => d.motivo === "sin-ruta");
+  const destinosNoLocalizados = destinosFallidos.filter((d) => d.motivo === "no-localizado");
   const destinosValidos = [...destinos].filter((d) => d.distancia !== Infinity).sort((a, b) => a.distancia - b.distancia);
   const sortedDestinos = destinosValidos;
   const filteredDestinos = busqueda
@@ -402,7 +402,9 @@ export default function Herramienta() {
                     <span className="text-white/30">[{destinos.length - (7 - i) > 0 ? destinos.length - (7 - i) : i + 1}/{total}]</span>{" "}
                     {d.municipio}{" "}
                     <span className="text-white/70">
-                      {d.distancia === Infinity ? "—" : `${d.distancia} km`}
+                      {d.distancia === Infinity
+                        ? "—"
+                        : `${d.estimada ? "≈ " : ""}${d.distancia} km`}
                     </span>
                   </motion.div>
                 ))}
@@ -477,7 +479,14 @@ export default function Herramienta() {
                             transition={{ delay: Math.min(i * 0.02, 2), duration: 0.2 }}
                             className="border-b border-border/50"
                           >
-                            <TableCell className="tabular-nums font-semibold">
+                            {/* La tilde avisa de que ese kilometraje es estimado, no medido. */}
+                            <TableCell
+                              className="tabular-nums font-semibold"
+                              title={dest.estimada ? "Distancia estimada" : undefined}
+                            >
+                              {dest.estimada && (
+                                <span className="text-muted-foreground font-normal">≈ </span>
+                              )}
                               {dest.distancia}
                             </TableCell>
                             <TableCell className="font-medium">
@@ -509,12 +518,16 @@ export default function Herramienta() {
                 className="mt-8"
               >
                 <h3 className="text-lg font-semibold text-foreground mb-3">
-                  Destinos sin ruta disponible ({destinosFallidos.length})
+                  Destinos sin distancia ({destinosFallidos.length})
                 </h3>
                 <Card className="glass">
                   <CardContent className="p-5">
                     <p className="text-sm text-muted-foreground mb-4">
-                      Google Maps no pudo calcular la distancia en coche a estos municipios. Esto suele ocurrir con destinos insulares (Baleares, Canarias, Ceuta, Melilla) o direcciones no reconocidas.
+                      {destinosSinRuta.length > 0 && destinosNoLocalizados.length > 0
+                        ? "Algunos no están unidos por carretera con tu municipio (Baleares, Canarias, Ceuta y Melilla) y otros no se han podido localizar, normalmente por una errata en el nombre."
+                        : destinosSinRuta.length > 0
+                          ? "No están unidos por carretera con tu municipio: son destinos insulares (Baleares, Canarias) o Ceuta y Melilla."
+                          : "No se han podido localizar. Suele deberse a una errata en el nombre del municipio o a un núcleo muy pequeño."}
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                       {destinosFallidos.map((d, i) => (

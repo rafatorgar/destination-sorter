@@ -1,0 +1,19 @@
+{
+  // Configuración de despliegue en Cloudflare Workers.
+  //
+  // No hay `main`: este Worker no ejecuta código, solo sirve los ficheros que
+  // Next deja en `out/`. Es el equivalente a un proyecto de Pages en el flujo
+  // nuevo del panel, que es el único que Cloudflare ofrece ya para proyectos
+  // nuevos.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "destinos-oposiciones",
+  "compatibility_date": "2026-07-30",
+
+  "assets": {
+    "directory": "./out",
+
+    // Next genera `out/404.html`. Sin esto, una ruta inexistente devuelve el
+    // 404 genérico de Cloudflare en lugar de la página del sitio.
+    "not_found_handling": "404-page"
+  }
+}

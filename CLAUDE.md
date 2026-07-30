@@ -4,20 +4,34 @@
 Hay una carpeta `context/` en la raíz del repositorio con el historial de cambios del proyecto. Cada archivo es una sesión (`YYYY-MM-DD_descripcion.md`). **Lee `context/README.md` para ver el índice y consulta el archivo más reciente** al inicio de cada sesión para tener contexto.
 
 ## Stack
-- **Frontend:** Next.js 14 (App Router) + TypeScript + Tailwind v3 + shadcn/ui v2 + Framer Motion
-- **Backend:** FastAPI + Python 3 + Google Maps Distance Matrix API
-- Node 20 requerido para el frontend (`nvm use 20`)
+- **Todo el producto es front.** No hay backend ni API de pago: el Excel se lee en
+  el navegador, los municipios salen de un JSON estático y las distancias las da
+  Valhalla directamente desde el cliente.
+- Next.js 14 (App Router, `output: "export"`) + TypeScript + Tailwind v3 + shadcn/ui v2 + Framer Motion
+- Node 20 requerido (`nvm use 20`)
 - shadcn/ui debe instalarse con `npx shadcn@2.5.0 add <componente>` (v2, compatible con Tailwind v3)
+
+### Servicios externos (todos gratis y sin API key)
+- **Valhalla** (`valhalla1.openstreetmap.de`) — distancias por carretera
+- **CARTO** — tiles del mapa de resultados
+- **Overpass** — solo al regenerar los datasets, nunca en tiempo de ejecución
+
+Son instancias comunitarias: las llamadas salen del navegador de cada usuario, no
+de un servidor nuestro, pero conviene no castigarlas.
 
 ## Cómo arrancar
 ```bash
-# Backend
-cd backend && python3 -m uvicorn main:app --port 8000
-
-# Frontend
 cd frontend && nvm use 20 && npm run dev
 ```
-El backend necesita `GOOGLE_MAPS_API_KEY` en `backend/.env`.
+No hace falta ninguna variable de entorno.
+
+## Regenerar las bases de datos
+Solo cuando se quieran datos más frescos de OpenStreetMap; no es parte del build.
+```bash
+cd frontend
+node scripts/build-municipios.mjs   # public/municipios.json — 8.133 municipios
+node scripts/build-nucleos.mjs      # public/nucleos.json — 79.853 pedanías y barriadas
+```
 
 ## Reglas de diseño
 - Paleta: **solo blanco, negro y grises**. Sin colores de acento.
@@ -35,21 +49,27 @@ El backend necesita `GOOGLE_MAPS_API_KEY` en `backend/.env`.
 
 ## Estructura
 ```
-backend/
-  main.py          # FastAPI app con streaming NDJSON
-  .env             # GOOGLE_MAPS_API_KEY (no commitear)
-  requirements.txt
 frontend/
-  src/app/         # Pages (landing + herramienta)
+  src/app/         # Pages (landing + herramienta + blog)
   src/components/  # UI components + icons
-  public/          # Assets (google-maps-icon.png)
-context/
-  CHANGELOG.md     # Historial de cambios por sesión
+  src/lib/
+    excel.ts       # lee el .xlsx en el navegador (SheetJS)
+    municipios.ts  # sitúa municipios; búsqueda en cascada
+    nucleos.ts     # segunda pasada: pedanías. Carga diferida (~1 MB)
+    distancias.ts  # cliente de Valhalla
+    procesa.ts     # orquestador: excel → lugares → distancias
+    geo.ts         # haversine y el tipo Lugar
+  scripts/         # generadores de los datasets desde Overpass
+  public/          # municipios.json, nucleos.json, assets, _headers
+backend/           # ⚠️ obsoleto: ya no se usa. Borrar tras migrar el DNS
+context/           # historial por sesión
 ```
 
 ## Deploy
-- **Railway** con dos servicios conectados al repo de GitHub (auto-deploy)
-- **Frontend**: `frontend-production-1e891.up.railway.app` (puerto 8080)
-- **Backend**: `backend-production-caf0.up.railway.app` (puerto 8080)
-- **Dominio**: `destinosoposiciones.rafatorresgarcia.com` (DNS en Cloudflare, nube gris)
-- Variables de entorno en Railway: `GOOGLE_MAPS_API_KEY` (backend), `NEXT_PUBLIC_BACKEND_URL` (frontend)
+**En transición.** Hoy sigue en Railway; el destino es Cloudflare Pages.
+
+- **Cloudflare Pages** (pendiente): raíz `frontend`, build `npm run build`,
+  salida `out`, sin variables de entorno.
+- **Dominio**: `destinosoposiciones.rafatorresgarcia.com` (DNS en Cloudflare)
+- El backend y los `Procfile` siguen en el repo hasta que el dominio apunte a
+  Pages. Borrarlos antes deja producción rota.
